@@ -1,33 +1,39 @@
-node {
-    def app
+pipeline{
 
-    stage('Clone repository') {
-        /* Cloning the Repository to our Workspace */
+	agent any
 
-        checkout scm
-    }
+	environment {
+		DOCKERHUB_CREDENTIALS=credentials('745801')
+	}
 
-    stage('Build image') {
-        /* This builds the actual image */
+	stages {
 
-        app = docker.build("71098/whiteboard")
-    }
+		stage('Build') {
 
-    stage('Test image') {
-        
-        app.inside {
-            echo "Tests passed"
-        }
-    }
+			steps {
+				sh 'docker build -t 745801/whiteboard:latest .'
+			}
+		}
 
-    stage('Push image') {
-        /* 
-			You would need to first register with DockerHub before you can push images to your account
-		*/
-        docker.withRegistry('https://registry.hub.docker.com', '745801') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-            } 
-                echo "Trying to Push Docker Build to DockerHub"
-    }
+		stage('Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
+
+		stage('Push') {
+
+			steps {
+				sh 'docker push 745801/whiteboard:latest'
+			}
+		}
+	}
+
+	post {
+		always {
+			sh 'docker logout'
+		}
+	}
+
 }
