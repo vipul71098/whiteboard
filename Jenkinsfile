@@ -1,40 +1,28 @@
-pipeline {
-    agent any
- stages {
-  stage('Docker Build and Tag') {
-           steps {
-              
-                sh 'docker build -t nginxtest:latest .' 
-                  sh 'docker tag nginxtest nikhilnidhi/nginxtest:latest'
-                sh 'docker tag nginxtest nikhilnidhi/nginxtest:$BUILD_NUMBER'
-               
-          }
+node {
+    def app
+    stage('Clone repository') {
+        /* Cloning the Repository to our Workspace */
+        checkout scm
+    }
+    stage('Build image') {
+        /* This builds the actual image */
+        app = docker.build("71098/whiteboard")
+    }
+    stage('Test image') {
+        
+        app.inside {
+            echo "Tests passed"
         }
-     
-  stage('Publish image to Docker Hub') {
-          
-            steps {
-        withDockerRegistry([ credentialsId: "dockerHub", url: "" ]) {
-          sh  'docker push nikhilnidhi/nginxtest:latest'
-          sh  'docker push nikhilnidhi/nginxtest:$BUILD_NUMBER' 
-        }
-                  
-          }
-        }
-     
-      stage('Run Docker container on Jenkins Agent') {
-             
-            steps {
-                sh "docker run -d -p 4030:80 nikhilnidhi/nginxtest"
- 
-            }
-        }
- stage('Run Docker container on remote hosts') {
-             
-            steps {
-                sh "docker -H ssh://jenkins@15.206.172.149 run -d -p 4001:80 nikhilnidhi/nginxtest"
- 
-            }
-        }
+    }
+    stage('Push image') {
+        /* 
+			You would need to first register with DockerHub before you can push images to your account
+		*/
+        docker.withRegistry('https://registry.hub.docker.com', '71098') {
+        docker.withRegistry('https://registry.hub.docker.com', '745801') {
+            app.push("${env.BUILD_NUMBER}")
+            app.push("latest")
+            } 
+                echo "Trying to Push Docker Build to DockerHub"
     }
 }
