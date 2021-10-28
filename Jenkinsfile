@@ -22,7 +22,7 @@ pipeline{
         stage('Docker Run') {
            steps{
                script {
-                 dockerImage.run("-p 8096:5000 --rm --name mywhiteboard")
+                 dockerImage.run("-p 80:80 --rm --name mywhiteboard1")
                }
             }
        }
