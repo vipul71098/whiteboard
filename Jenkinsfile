@@ -1,29 +1,46 @@
-node {
-    def app
-    stage('Clone repository') {
-        /* Cloning the Repository to our Workspace */
-        checkout scm
-    }
-    stage('Build image') {
-        /* This builds the actual image */
-        app = docker.build("71098/whiteboard")
-    }
-    stage('Test image') {
-        
-        app.inside {
-            echo "Tests passed"
-        }
-    }
-    stage('Push image') {
-        /* 
-			You would need to first register with DockerHub before you can push images to your account
-		*/
-        docker.withRegistry('https://registry.hub.docker.com', '71098') {
-        docker.withRegistry('https://registry.hub.docker.com', '745801') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-            } 
-                echo "Trying to Push Docker Build to DockerHub"
-    }
-}
+pipeline{
+
+	agent {label 'linux'}
+
+	environment {
+		DOCKERHUB_CREDENTIALS=credentials('745801')
+	}
+
+	stages {
+	    
+	    stage('gitclone') {
+
+			steps {
+				git 'https://github.com/shazforiot/nodeapp_test.git'
+			}
+		}
+
+		stage('Build') {
+
+			steps {
+				sh 'docker build -t 745801/whiteboard:latest .'
+			}
+		}
+
+		stage('Login') {
+
+			steps {
+				sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+			}
+		}
+
+		stage('Push') {
+
+			steps {
+				sh 'docker push 745801/whiteboard:latest'
+			}
+		}
+	}
+
+	post {
+		always {
+			sh 'docker logout'
+		}
+	}
+
 }
