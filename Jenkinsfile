@@ -6,7 +6,7 @@ pipeline{
         registryCredential = 'docker_hub'
     }
     stages {
-        stage('checkout'){
+        stage('Git Clone Repo'){
             steps{
                 checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/vipul71098/whiteboard.git']]])
             }
@@ -18,11 +18,17 @@ pipeline{
                 }
             }
         }
+        stage('Docker stop container') {
+         steps {
+            sh 'docker ps -f name=mywhiteboard -q | xargs --no-run-if-empty docker container stop'
+            sh 'docker container ls -a -fname=mywhiteboard -q | xargs -r docker container rm'
+         }
+       }
         
-        stage('Docker Run') {
+        stage('Docker Run Container') {
            steps{
                script {
-                 dockerImage.run("-p 80:80 --rm --name mywhiteboard1")
+                 dockerImage.run("-p 8096:5000 --rm --name mywhiteboard")
                }
             }
        }
