@@ -7,13 +7,6 @@ pipeline{
 	}
 
 	stages {
-	    
-	    stage('gitclone') {
-
-			steps {
-				git 'https://github.com/vipul71098/whiteboard.git'
-			}
-		}
 
 		stage('Build') {
 
