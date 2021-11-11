@@ -20,8 +20,8 @@ pipeline{
         }
         stage('Docker stop container') {
          steps {
-            sh 'docker ps -f name=mywhiteboard -q | xargs --no-run-if-empty docker container stop'
-            sh 'docker container ls -a -fname=mywhiteboard -q | xargs -r docker container rm'
+            sh 'sudo docker ps -f name=mywhiteboard -q | xargs --no-run-if-empty docker container stop'
+            sh 'sudo docker container ls -a -fname=mywhiteboard -q | xargs -r docker container rm'
          }
        }
         
