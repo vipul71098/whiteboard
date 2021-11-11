@@ -1,5 +1,5 @@
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-8" />
 <style>
 * {
 	margin: 0;
@@ -8,21 +8,30 @@
 
 body, html {
 	height: 100%;
+	background: blanchedalmond;
 }
 
 #myCanvas {
-	cursor: crosshair;
+
+    cursor: crosshair;
     position: fixed;
+    border: 2px solid black;
+    height: 600px;
+    margin-left: 74px;
+	margin-top: 50px;
+}
+
+
 }
 </style>
 <title>HTML5 Canvas Drawing Board</title>
 <script type="text/JavaScript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?ver=1.4.2"></script>
 </head>
 <body>
-	 <h1><center>Hello, This is simple whiteboard running on  AWS EC2 instance</center></h1>
+    <h1><center>Hello, This is simple whiteboard running on  AWS EC2 instance</center></h1>
 	<h3><center>This is deploy using git, jenkins and docker pipeline.</center></h3>
 	<canvas id="myCanvas">
-		So, your browser does not support HTML5 canvas technology.
+		Sorry, your browser does not support HTML5 canvas technology.
 	</canvas>
 </body>
 </html>
@@ -30,21 +39,21 @@ body, html {
 window.onload = function() {
 	var myCanvas = document.getElementById("myCanvas");
 	var ctx = myCanvas.getContext("2d");
-    
+
     // Fill Window Width and Height
     myCanvas.width = window.innerWidth;
 	myCanvas.height = window.innerHeight;
-	
+
 	// Set Background Color
     ctx.fillStyle="#fff";
     ctx.fillRect(0,0,myCanvas.width,myCanvas.height);
-	
+
     // Mouse Event Handlers
 	if(myCanvas){
 		var isDown = false;
 		var canvasX, canvasY;
 		ctx.lineWidth = 5;
-		
+
 		$(myCanvas)
 		.mousedown(function(e){
 			isDown = true;
@@ -67,7 +76,7 @@ window.onload = function() {
 			ctx.closePath();
 		});
 	}
-	
+
 	// Touch Events Handlers
 	draw = {
 		started: false,
@@ -100,15 +109,16 @@ window.onload = function() {
 			this.started = false;
 		}
 	};
-	
+
 	// Touch Events
 	myCanvas.addEventListener('touchstart', draw.start, false);
 	myCanvas.addEventListener('touchend', draw.end, false);
 	myCanvas.addEventListener('touchmove', draw.move, false);
-	
+
 	// Disable Page Move
 	document.body.addEventListener('touchmove',function(evt){
 		evt.preventDefault();
 	},false);
 };
 </script>
+
